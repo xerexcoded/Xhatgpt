@@ -12,9 +12,18 @@ import {
   Message,
   MessageInput,
   TypingIndicator,
+  ConversationHeader,
+  Avatar,
+  VoiceCallButton,
+  VideoCallButton,
+  StarButton,
+  InfoButton,
 } from "@chatscope/chat-ui-kit-react";
 
-const API_KEY = "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";
+const API_KEY = "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";
+
+//make system message have dynamic content
+
 const systemMessage = {
   //  Explain things like you're talking to a software professional with 5 years of experience.
   role: "system",
@@ -25,41 +34,61 @@ const systemMessage = {
 function App() {
   const [messages, setMessages] = useState([
     {
-      message: "Hello I am Xee",
+      message: "Hello, I'm XhatGPT! Ask me anything!",
       sentTime: "just now",
-      sender: "Xee",
+      sender: "XhatGPT",
     },
   ]);
   const [isTyping, setIsTyping] = useState(false);
+
   const handleSend = async (message) => {
-    const newMessage = { message, direction: "outgoing", sender: "user" };
-    //added new message to the messages array
+    const newMessage = {
+      message,
+      direction: "outgoing",
+      sender: "user",
+    };
+
     const newMessages = [...messages, newMessage];
+
     setMessages(newMessages);
 
-    //Initial system message to determine xees response
+    // Initial system message to determine XhatGPT functionality
+    // How it responds, how it talks, etc.
     setIsTyping(true);
-    await processMessagetoXee(message);
+    await processMessageToXhatGPT(newMessages);
   };
 
-  async function processMessagetoXee(chatMessages) {
-    let apiMessage = chatMessages.map((messageObject) => {
+  async function processMessageToXhatGPT(chatMessages) {
+    // messages is an array of messages
+    // Format messages for XhatGPT API
+    // API is expecting objects in format of { role: "user" or "assistant", "content": "message here"}
+    // So we need to reformat
+
+    let apiMessages = chatMessages.map((messageObject) => {
       let role = "";
-      if (messageObject.sender === "Xee") {
+      if (messageObject.sender === "XhatGPT") {
         role = "assistant";
       } else {
         role = "user";
       }
       return { role: role, content: messageObject.message };
     });
+
+    // Get the request body set up with the model we plan to use
+    // and the messages which we formatted above. We add a system message in the front to'
+    // determine how we want XhatGPT to act.
     const apiRequestBody = {
       model: "gpt-3.5-turbo",
-      messages: [systemMessage, ...apiMessage],
+      messages: [
+        systemMessage, // The system message DEFINES the logic of our XhatGPT
+        ...apiMessages, // The messages from our chat with XhatGPT
+      ],
     };
-    await fetch("https://api.chatgpt.com/v1/chat/completions", {
+
+    await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: "Bearer" + API_KEY,
+        Authorization: "Bearer " + API_KEY,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(apiRequestBody),
@@ -71,16 +100,31 @@ function App() {
         console.log(data);
         setMessages([
           ...chatMessages,
-          { message: data.choices[0].message.content, sender: "Xee" },
+          {
+            message: data.choices[0].message.content, //
+            sender: "XhatGPT",
+          },
         ]);
         setIsTyping(false);
       });
   }
   return (
     <div className="App">
-      <div style={{ position: "relative", height: "800px", width: "700px" }}>
+      <div style={{ position: "relative", height: "700px", width: "700px" }}>
         <MainContainer>
           <ChatContainer>
+            <ConversationHeader>
+              <ConversationHeader.Content>
+                <span
+                  style={{
+                    color: "#ec1212",
+                    alignSelf: "flex-center",
+                  }}
+                >
+                  XhatGPT
+                </span>
+              </ConversationHeader.Content>
+            </ConversationHeader>
             <MessageList
               scrollBehavior="smooth"
               typingIndicator={
