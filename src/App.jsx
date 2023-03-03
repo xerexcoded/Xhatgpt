@@ -20,7 +20,7 @@ import {
   InfoButton,
 } from "@chatscope/chat-ui-kit-react";
 
-const API_KEY = "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";
+const API_KEY = "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";
 
 //make system message have dynamic content
 
