@@ -25,9 +25,9 @@ const systemMessage = {
 function App() {
   const [messages, setMessages] = useState([
     {
-      messages: "Hello I am Xee",
+      message: "Hello I am Xee",
+      sentTime: "just now",
       sender: "Xee",
-      sentTime: "just now sent",
     },
   ]);
   const [isTyping, setIsTyping] = useState(false);
@@ -59,8 +59,8 @@ function App() {
     await fetch("https://api.chatgpt.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
         Authorization: "Bearer" + API_KEY,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(apiRequestBody),
     })
